@@ -4,6 +4,8 @@ import 'ag-grid-enterprise';
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { copyRow, remove, update } from '../grid.actions';
+import { NodeWithI18n } from '@angular/compiler';
 
 @Component({
   selector: 'grid',
@@ -11,9 +13,6 @@ import { Observable } from 'rxjs';
   styleUrls: ['./grid.component.scss'],
 })
 export class GridComponent implements OnInit {
-  private gridApi: any;
-  private gridColumnApi: any;
-
   rowData$: Observable<{}[]>;
   columnDefs$: Observable<ColDef[]>;
 
@@ -28,6 +27,8 @@ export class GridComponent implements OnInit {
     });
   }
 
+  private gridApi: any;
+  private gridColumnApi: any;
   getRowNodeId(data: any) {
     return data.id;
   }
@@ -43,30 +44,37 @@ export class GridComponent implements OnInit {
     valueSetter: ({ colDef, data, newValue }: any) => {
       let updatedRow = { ...data };
       updatedRow[colDef.field] = newValue;
-      // this.store.dispatch(new UpdateRow(updatedRow));
+      this.store.dispatch(update({ updatedRow }));
       return false;
     },
   };
   newIds = 3;
 
-  ngOnInit(): void {}
-
   getContextMenuItems = (params: any) => {
     // helpers for context menu
     let data = params.node.data;
-    let rowId = this.getRowNodeId(data);
+    let rowId: number = this.getRowNodeId(data);
 
     // context menu options
     var result = [
       {
-        name: '<b>Add</b> ' + data.model,
-        action: () => {},
+        name: '<b>Copy</b> ' + data.model,
+        action: () => {
+          this.newIds++;
+          this.store.dispatch(
+            copyRow({ rowToCopyId: rowId, newId: this.newIds })
+          );
+        },
       },
       {
         name: '<b>Delete</b> ' + data.model,
-        action: () => {},
+        action: () => {
+          this.store.dispatch(remove({ id: rowId }));
+        },
       },
     ];
     return result;
   };
+
+  ngOnInit(): void {}
 }
