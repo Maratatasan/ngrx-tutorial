@@ -3,8 +3,12 @@ import { increment, decrement, reset } from './counter.actions';
 
 export const initialState = {
   count: 0,
-  rowData: [],
-  columnDefinitions: [],
+  rowData: [
+    { make: 'Toyota', model: 'Celica', price: 35000 },
+    { make: 'Ford', model: 'Mondeo', price: 32000 },
+    { make: 'Porsche', model: 'Boxter', price: 72000 },
+  ],
+  columnDefs: [{ field: 'make' }, { field: 'model' }, { field: 'price' }],
 };
 
 const _reducer = createReducer(
